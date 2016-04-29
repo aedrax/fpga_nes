@@ -65,7 +65,7 @@ BOOL SerialComm::Init()
 
     if (ret)
     {
-        m_hSerialComm = CreateFile(_T("COM5"),
+        m_hSerialComm = CreateFile(_T("COM2"),
                                    GENERIC_READ | GENERIC_WRITE,
                                    0,
                                    0,
@@ -78,11 +78,11 @@ BOOL SerialComm::Init()
             ret = FALSE;
             if (GetLastError() == ERROR_FILE_NOT_FOUND)
             {
-                MessageBox(NULL, _T("\"COM5\" file not found."), _T("NesDbg"), MB_OK);
+                MessageBox(NULL, _T("\"COM2\" file not found."), _T("NesDbg"), MB_OK);
             }
             else
             {
-                MessageBox(NULL, _T("Unknown error initializing COM5"), _T("NesDbg"), MB_OK);
+                MessageBox(NULL, _T("Unknown error initializing COM2"), _T("NesDbg"), MB_OK);
             }
         }
     }
@@ -95,7 +95,7 @@ BOOL SerialComm::Init()
         if (!GetCommState(m_hSerialComm, &serialConfig))
         {
             ret = FALSE;
-            MessageBox(NULL, _T("Error getting comm state for COM5."), _T("NesDbg"), MB_OK);
+            MessageBox(NULL, _T("Error getting comm state for COM2."), _T("NesDbg"), MB_OK);
         }
     }
 
@@ -109,7 +109,7 @@ BOOL SerialComm::Init()
         if (!SetCommState(m_hSerialComm, &serialConfig))
         {
             ret = FALSE;
-            MessageBox(NULL, _T("Error setting comm state for COM5."), _T("NesDbg"), MB_OK);
+            MessageBox(NULL, _T("Error setting comm state for COM2."), _T("NesDbg"), MB_OK);
         }
     }
 
@@ -126,7 +126,7 @@ BOOL SerialComm::Init()
         if (!SetCommTimeouts(m_hSerialComm, &timeouts))
         {
             ret = FALSE;
-            MessageBox(NULL, _T("Error setting timeout state for COM5."), _T("NesDbg"), MB_OK);
+            MessageBox(NULL, _T("Error setting timeout state for COM2."), _T("NesDbg"), MB_OK);
         }
     }
 
