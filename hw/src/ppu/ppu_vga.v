@@ -39,7 +39,9 @@ module ppu_vga
   output wire [9:0] nes_y_out,           // nes y coordinate
   output wire [9:0] nes_y_next_out,      // next line's nes y coordinate
   output wire       pix_pulse_out,       // 1 clk pulse prior to nes_x update
-  output wire       vblank_out           // indicates a vblank is occuring (no PPU vram access)
+  output wire       vblank_out,          // indicates a vblank is occuring (no PPU vram access)
+  output wire		  sync_en,				  // vga enable signal
+  output wire		  pix_clk
 );
 
 // Display dimensions (640x480).
@@ -56,7 +58,7 @@ localparam [7:0] BORDER_COLOR = 8'h49;
 //
 // VGA_SYNC: VGA synchronization control block.
 //
-wire       sync_en;      // vga enable signal
+//wire       sync_en;      // vga enable signal
 wire [9:0] sync_x;       // current vga x coordinate
 wire [9:0] sync_y;       // current vga y coordinate
 wire [9:0] sync_x_next;  // vga x coordinate for next clock
@@ -70,7 +72,8 @@ vga_sync vga_sync_blk(
   .x(sync_x),
   .y(sync_y),
   .x_next(sync_x_next),
-  .y_next(sync_y_next)
+  .y_next(sync_y_next),
+  .pix_pulse(pix_clk)
 );
 
 //

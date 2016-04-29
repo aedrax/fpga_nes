@@ -37,13 +37,43 @@ module nes_top
   output wire       TXD,               // rs-232 tx signal
   output wire       VGA_HSYNC,         // vga hsync signal
   output wire       VGA_VSYNC,         // vga vsync signal
-  output wire [2:0] VGA_RED,           // vga red signal
-  output wire [2:0] VGA_GREEN,         // vga green signal
-  output wire [1:0] VGA_BLUE,          // vga blue signal
+  //output wire [2:0] VGA_RED,           // vga red signal
+  //output wire [2:0] VGA_GREEN,         // vga green signal
+  //output wire [1:0] VGA_BLUE,          // vga blue signal
+  output wire		  OUT_RED,
+  output wire		  OUT_GREEN,
+  output wire		  OUT_BLUE,
   output wire       NES_JOYPAD_CLK,    // joypad output clk signal
   output wire       NES_JOYPAD_LATCH,  // joypad output latch signal
-  output wire       AUDIO              // pwm output audio channel
+  output wire       AUDIO,             // pwm output audio channel
+  output wire [2:0] TMDS_out_P,
+  output wire [2:0] TMDS_out_N,
+  output wire 		  TMDS_out_P_clock,
+  output wire		  TMDS_out_N_clock
 );
+
+wire [2:0] VGA_RED;           // vga red signal
+wire [2:0] VGA_GREEN;         // vga green signal
+wire [1:0] VGA_BLUE; 
+
+reg pixel_clock_t;
+reg data_load_clock_t;
+reg ioclock_t;
+reg serdes_strobe_t;
+
+reg [7:0] red_mux;
+
+wire [7:0] red_t;
+wire [7:0] green_t;
+wire [7:0] blue_t;
+reg blank_t;
+reg hsync_t;
+reg vsync_t;
+
+reg tmds_out_red_t;
+reg tmds_out_green_t;
+reg tmds_out_blue_t;
+reg tmds_out_clock_t;								
 
 //
 // System Memory Buses
@@ -171,6 +201,8 @@ wire [ 7:0] ppu_vram_din;   // ppu video ram data bus (input)
 wire [ 7:0] ppu_vram_dout;  // ppu video ram data bus (output)
 
 wire        ppu_nvbl;       // ppu /VBL signal.
+wire			sync_en;
+wire			pix_clk;
 
 // PPU snoops the CPU address bus for register reads/writes.  Addresses 0x2000-0x2007
 // are mapped to the PPU register space, with every 8 bytes mirrored through 0x3FFF.
@@ -196,8 +228,69 @@ ppu ppu_blk(
   .nvbl_out(ppu_nvbl),
   .vram_a_out(ppu_vram_a),
   .vram_d_out(ppu_vram_dout),
-  .vram_wr_out(ppu_vram_wr)
+  .vram_wr_out(ppu_vram_wr),
+  .sync_en(sync_en),
+  .pix_clk(pix_clk)
 );
+
+assign OUT_RED = |VGA_RED;
+assign OUT_GREEN = |VGA_GREEN;
+assign OUT_BLUE = |VGA_BLUE;
+
+
+hdmi_converter convert(
+	.pixclk(pix_clk),  // 25MHz
+	.hSync(VGA_HSYNC),
+	.vSync(VGA_VSYNC),
+	.DrawArea(sync_en),
+	.red({VGA_RED,{5'b00000}}),
+	.green({VGA_GREEN,{5'b00000}}),
+	.blue({VGA_BLUE,{6'b000000}}),
+	.TMDSp(TMDS_out_P), 
+	.TMDSn(TMDS_out_N),
+	.TMDSp_clock(TMDS_out_P_clock), 
+	.TMDSn_clock(TMDS_out_N_clock)
+);
+
+/*
+hdmi_converter convert(
+	.pixclk(pix_clk),  // 25MHz
+	//.hSync(VGA_HSYNC),
+	//.vSync(VGA_VSYNC),
+	//.DrawArea(sync_en),
+	//.red(red_t),
+	//.green(green_t),
+	//.blue(blue_t),
+	.TMDSp(TMDS_out_P), 
+	.TMDSn(TMDS_out_N),
+	.TMDSp_clock(TMDS_out_P_clock), 
+	.TMDSn_clock(TMDS_out_N_clock)
+);
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 assign vram_a = { cart_ciram_a10, ppumc_a[9:0] };
 

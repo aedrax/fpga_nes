@@ -39,6 +39,34 @@ module jp
   output reg  [ 7:0] dout       // data output bus
 );
 
+// Unit Parameters //
+parameter Hz  = 1;
+parameter KHz = 1000*Hz;
+parameter MHz = 1000*KHz;
+
+// Context-sensitive Parameters //
+parameter MASTER_CLOCK_FREQUENCY = 100*MHz; // USER VARIABLE
+parameter OUTPUT_UPDATE_FREQUENCY = 120*Hz; // USER VARIABLE
+
+// Clock divider register size
+parameter DIVIDER_EXPONENT = log2( (MASTER_CLOCK_FREQUENCY / OUTPUT_UPDATE_FREQUENCY) / 10 ) - 2;
+
+// Helper functions
+function integer log2;
+	 input [31:0] value;
+	 begin
+		  value = value - 1;
+		  for (log2 = 0; value > 0; log2 = log2 + 1) begin
+				value = value >> 1;
+		  end
+	 end
+endfunction
+
+// Generate a clock for generating the data clock and sampling the controller's output
+reg [DIVIDER_EXPONENT:0] sample_count;
+wire sample_clock = sample_count[DIVIDER_EXPONENT];
+always @(posedge clk) sample_count <= sample_count + 1;
+
 //
 // FFs for tracking/reading current controller state.
 //
@@ -48,7 +76,7 @@ reg       q_jp_clk,    d_jp_clk;
 reg       q_jp_latch,  d_jp_latch;
 reg [8:0] q_cnt,       d_cnt;
 
-always @(posedge clk)
+always @(posedge sample_clock)
   begin
     if (rst)
       begin
@@ -68,6 +96,19 @@ always @(posedge clk)
       end
   end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 wire [2:0] state_idx;
 
 always @*
@@ -78,7 +119,7 @@ always @*
     d_jp_clk    = q_jp_clk;
     d_jp_latch  = q_jp_latch;
 
-    d_cnt = q_cnt + 9'h001;
+    d_cnt = q_cnt + 9'h004;
 
     // Drive LATCH signal to latch current controller state and return state of A button.  Pulse
     // clock 7 more times to read other 7 buttons.  Controller states are active low.
@@ -102,6 +143,19 @@ always @*
 assign state_idx = q_cnt[8:6] - 3'h1;
 assign jp_latch  = q_jp_latch;
 assign jp_clk    = q_jp_clk;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 localparam [15:0] JOYPAD1_MMR_ADDR = 16'h4016;
 localparam [15:0] JOYPAD2_MMR_ADDR = 16'h4017;
@@ -134,6 +188,23 @@ always @(posedge clk)
         q_strobe_state   <= d_strobe_state;
       end
   end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 always @*
   begin

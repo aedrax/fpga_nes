@@ -38,7 +38,8 @@ module vga_sync
   output wire [9:0] x,      // Current X position being displayed
   output wire [9:0] y,      // Current Y position being displayed (top = 0)
   output wire [9:0] x_next, // Next X position to be displayed next clock
-  output wire [9:0] y_next  // Next Y position to be displayed
+  output wire [9:0] y_next,  // Next Y position to be displayed
+  output wire pix_pulse
 );
 
 //
@@ -79,7 +80,7 @@ always @(posedge clk)
     q_en       <= d_en;
   end
 
-wire pix_pulse;     // 1 clk tick per-pixel
+//wire pix_pulse;     // 1 clk tick per-pixel
 wire line_pulse;    // 1 clk tick per-line (reset to h-pos 0)
 wire screen_pulse;  // 1 clk tick per-screen (reset to v-pos 0)
 

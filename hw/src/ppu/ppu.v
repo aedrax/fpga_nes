@@ -43,7 +43,9 @@ module ppu
   output wire        nvbl_out,      // /VBL (low during vertical blank)
   output wire [13:0] vram_a_out,    // video memory address bus
   output wire [ 7:0] vram_d_out,    // video memory data bus (output)
-  output wire        vram_wr_out    // video memory read/write select
+  output wire        vram_wr_out,    // video memory read/write select
+  output wire			sync_en,
+  output wire			pix_clk
 );
 
 //
@@ -69,7 +71,9 @@ ppu_vga ppu_vga_blk(
   .nes_y_out(vga_nes_y),
   .nes_y_next_out(vga_nes_y_next),
   .pix_pulse_out(vga_pix_pulse),
-  .vblank_out(vga_vblank)
+  .vblank_out(vga_vblank),
+  .sync_en(sync_en),
+  .pix_clk(pix_clk)
 );
 
 //
